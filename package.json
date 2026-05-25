@@ -10,5 +10,18 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bbtechpro/Lab_14.2-Secure-Record-Storage.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bbtechpro/Lab_14.2-Secure-Record-Storage/issues"
+  },
+  "homepage": "https://github.com/bbtechpro/Lab_14.2-Secure-Record-Storage#readme",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.6.2"
+  }
 }
