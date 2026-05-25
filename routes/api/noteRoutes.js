@@ -39,12 +39,22 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     // // This needs an authorization check
-       
-    const note = await Note.findByIdAndUpdate(req.params.id, req.body, { new: true });
+//     Secure “Update Note”: Modify the PUT /:id route. Before updating a note, you must first find the note by its ID. Then, check if the user field on that note matches the authenticated user’s _id.
+
+// If they match, proceed with the update.
+// If they do not match, return a 403 Forbidden status with an error message like "User is not authorized to update this note."
+
+    // find the note by its ID
+    const note = await Note.findById(req.params.id);  
     if (!note) {
       return res.status(404).json({ message: 'No note found with this id!' });
     }
-    res.json(note);
+    // Check if the user is authorized to update this note
+    if (note.user.toString() !== req.user._id) {
+      return res.status(403).json({ message: 'User is not authorized to update this note.' });
+    }
+    const updatedNote = await Note.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updatedNote);
   } catch (err) {
     res.status(500).json(err);
   }
