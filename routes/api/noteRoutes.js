@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { Note } = require('../../models');
+const { Note } = require('../../models/Note');
 const { authMiddleware } = require('../../utils/auth');
  
 // Apply authMiddleware to all routes in this file
@@ -10,9 +10,27 @@ router.use(authMiddleware);
 router.get('/', async (req, res) => {
  
 // Filter “Get All Notes”: Modify the GET / route. Instead of returning all notes in the database, it should now only return the notes where the user field matches the _id of the currently authenticated user (req.user._id).
+
   try {
     const notes = await Note.find({ user: req.user._id });
     res.json(notes);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+// Secure “Get Single Note”: If you have a GET /:id route, apply the same ownership check there as well. Only return the note if the user field on that note matches the authenticated user’s _id. If they do not match, return a 403 Forbidden status with an appropriate error message.
+
+router.get('/:id', async (req, res) => {
+  try {
+    const note = await Note.findById(req.params.id);
+    if (!note) {
+      return res.status(404).json({ message: 'No note found with this id!' });
+    }
+    if (note.user.toString() !== req.user._id) {
+      return res.status(403).json({ message: 'User is not authorized to view this note.' });
+    }
+    res.json(note);
   } catch (err) {
     res.status(500).json(err);
   }
@@ -25,6 +43,7 @@ router.post('/', async (req, res) => {
       ...req.body,
     
 //  When a new note is created, you must associate it with the currently logged-in user. The authenticated user’s data should be available on req.user from the authentication middleware. Save the user’s _id to the new note’s user field.
+
     user: req.user._id
 
     });
